@@ -1,4 +1,6 @@
-from Options import Choice, PreGameOptions
+from dataclasses import dataclass
+
+from Options import Choice, PerGameCommonOptions
 
 class StartingZone(Choice):
     """
@@ -7,13 +9,16 @@ class StartingZone(Choice):
     """
 
     display_name = "Starting Zone"
-    leaf_forest = 0
-    hot_crater = 1
-    music_plant = 2
-    ice_paradise = 3
-    sky_canyon = 4
-    techno_base = 5
-    egg_utopia = 6
+    option_leaf_forest = 0
+    option_hot_crater = 1
+    option_music_plant = 2
+    option_ice_paradise = 3
+    option_sky_canyon = 4
+    option_techno_base = 5
+    option_egg_utopia = 6
 
-class SADV2Options(PreGameOptions):
+    default = option_leaf_forest
+
+@dataclass
+class SADV2Options(PerGameCommonOptions):
     starting_zone: StartingZone

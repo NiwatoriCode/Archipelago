@@ -1,7 +1,6 @@
 import typing
 
 from BaseClasses import Item, ItemClassification
-from enum import IntFlag
 
 class ItemData(typing.NamedTuple):
     code: typing.Optional[int]
@@ -22,7 +21,7 @@ zone_table = {
     "Leaf Forest": ItemData(200, 1),
     "Hot Crater": ItemData(201, 1),
     "Music Plant": ItemData(202, 1),
-    "Ice Paradice": ItemData(203, 1),
+    "Ice Paradise": ItemData(203, 1),
     "Sky Canyon": ItemData(204, 1),
     "Techno Base": ItemData(205, 1),
     "Egg Utopia": ItemData(206, 1)
