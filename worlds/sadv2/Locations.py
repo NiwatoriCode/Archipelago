@@ -53,3 +53,14 @@ xx_locations = {
 event_locations = {
     "True Area 53": None
 }
+
+all_locations = {
+    **leaf_forest_locations,
+    **hot_crater_locations,
+    **music_plant_locations,
+    **ice_paradise_locations,
+    **sky_canyon_locations,
+    **techno_base_locations,
+    **egg_utopia_locations,
+    **xx_locations
+}

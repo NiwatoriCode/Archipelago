@@ -4,6 +4,7 @@ from BaseClasses import Region, Multiworld, Location, Entrance
 from Locations import leaf_forest_locations, hot_crater_locations, music_plant_locations, ice_paradise_locations, \
                         sky_canyon_locations, techno_base_locations, egg_utopia_locations, xx_locations, SADV2Location
 from Items import zone_table
+from .Options import SADV2Options
 
 class SADV2Region(Region):
     game: str = "Sonic Advance 2"
