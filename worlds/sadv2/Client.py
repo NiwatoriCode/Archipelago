@@ -2,6 +2,7 @@ from typing import TYPE_CHECKING, Tuple, Dict
 
 import worlds._bizhawk as bizhawk
 from worlds._bizhawk.client import BizHawkClient
+from NetUtils import ClientStatus, NetworkItem
 
 if TYPE_CHECKING:
     from world._bizhawk.context import BizHawkClientContext, BizHawkClientCommandProcessor
@@ -12,7 +13,7 @@ SADV2_UPDATE_EMERALDS = 0x6c5d4 #rom
 SADV2_CHARACTERS_UNLOCKED = 0x266b #ewram
 SADV2_SONIC_EMERALDS = 0x2664 #ewram
 SADV2_SONIC_LEVELS_UNLOCKED = 0x265f #ewram
-SADV2_AREA_53_UNLOCKED = 0x2672
+SADV2_AREA_53_UNLOCKED = 0x2672 #ewram
 SADV2_LEVEL_COMPLETE = 0x54a8 #iwram
 SADV2_STAGE_FLAGS = 0x5424 #iwram, seventh bit is demo mode (i think)
 SADV2_CURRENT_LEVEL = 0x55b4 #iwram
@@ -31,12 +32,23 @@ zone_data: Dict[int, Tuple[int, int, int, int]] = {
     207: [0x1c, 0x0e] # XX
 }
 
+emerald_masks: Dict[int, int] = {
+    300: 0x01,
+    301: 0x02,
+    302: 0x04,
+    303: 0x08,
+    304: 0x10,
+    305: 0x20,
+    306: 0x40
+}
+
 class SonicAdvance2Client(BizHawkClient):
     game = "Sonic Advance 2"
     system = "GBA"
 
     starting_zone: int
     did_setup: bool = False
+    emeralds: int = 0x00
 
     async def validate_rom(self, ctx: "BizHawkClientContext") -> bool:
         try:
@@ -81,21 +93,55 @@ class SonicAdvance2Client(BizHawkClient):
             await bizhawk.write(ctx.bizhawk_ctx, [(SADV2_SONIC_LEVELS_UNLOCKED, [0x18, 0x18, 0x18, 0x18, 0x18], "EWRAM")])
 
             self.did_setup = True
+
         try:
-            level_complete, demo_mode, zone_id, character_id = await bizhawk.read(ctx.bizhawk_ctx, [
+            level_complete, demo_mode, act_id, character_id = await bizhawk.read(ctx.bizhawk_ctx, [
                 (SADV2_LEVEL_COMPLETE, 1, "IWRAM"), (SADV2_STAGE_FLAGS, 1, "IWRAM"),
                 (SADV2_CURRENT_LEVEL, 1, "IWRAM"), (SADV2_CURRENT_CHARACTER, 1, "IWRAM")])
             
+            await self.add_items(ctx.items_received, ctx)
+            
             if not (int.from_bytes(demo_mode, "little") & 0x40):
-                if (int.from_bytes(level_complete, "little") == 0xFF):
-                    print(int.from_bytes(level_complete, "little"))
-                    location_id = 0x10000 + (int.from_bytes(character_id) * 0x1000) + (int.from_bytes(zone_id) * 0x10)
+                if (int.from_bytes(level_complete, "little") == 0xFF and int.from_bytes(act_id) != 0x1d):
+                    location_id = 0x10000 + (int.from_bytes(character_id) * 0x1000) + (int.from_bytes(act_id) * 0x10)
                     if location_id not in ctx.checked_locations:
                         await ctx.send_msgs([{
                             "cmd": "LocationChecks",
                             "locations": [location_id]
                         }])
+                elif(int.from_bytes(level_complete, "little") == 0xFF and int.from_bytes(act_id) == 0x1d):
+                    await ctx.send_msgs([{
+                        "cmd": "StatusUpdate",
+                        "status": ClientStatus.CLIENT_GOAL
+                    }])
+
+            
         except bizhawk.RequestFailedError:
             pass
 
-        
+    async def add_items(self, item_list: list[NetworkItem], ctx: "BizHawkClientContext") -> None:
+        """
+            Take items, convert them to their in-game ids and place them where they belong.
+            Only the emeralds variable matters for logic
+            Setting emeralds in game is visual only for tracking purposes
+        """
+
+        for item in item_list:
+
+            item_id = item.item
+            if (item_id // 100 == 1):
+                print("The dev needs to add characters.")
+            elif (item_id // 100 == 2):
+
+                await bizhawk.write(ctx.bizhawk_ctx, [(SADV2_ZONE_SELECT_TABLE + zone_data[item_id][1],
+                                                     [zone_data[item_id][0], zone_data[item_id][2]], "ROM")])
+            elif (item_id // 100 == 3 and self.emeralds != 0x7f):
+                self.emeralds = self.emeralds | emerald_masks[item_id]
+
+                if(self.emeralds == 0x7F):
+                    await bizhawk.write(ctx.bizhawk_ctx, [(SADV2_SONIC_LEVELS_UNLOCKED, [0x1d, 0x1d, 0x1d, 0x1d, 
+                                                                                         0x1d], "EWRAM")])
+                    await bizhawk.write(ctx.bizhawk_ctx, [(SADV2_AREA_53_UNLOCKED, [0x02], "EWRAM")])
+                    
+                await bizhawk.write(ctx.bizhawk_ctx, [(SADV2_SONIC_EMERALDS, [self.emeralds, self.emeralds,
+                                                    self.emeralds, self.emeralds, self.emeralds], "EWRAM")])
