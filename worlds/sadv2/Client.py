@@ -8,7 +8,8 @@ if TYPE_CHECKING:
     from world._bizhawk.context import BizHawkClientContext, BizHawkClientCommandProcessor
 
 SADV2_ZONE_SELECT_TABLE = 0xd7508 #rom
-SADV2_UPDATE_ZONE_SELECT = 0x30EB2 #rom
+SADV2_UPDATE_ZONE_SELECT_BOSS = 0x30EB0 #rom
+SADV2_UPDATE_ZONE_SELECT_LEVEL = 0x30f92 #rom
 SADV2_UPDATE_EMERALDS = 0x6c5d4 #rom
 SADV2_CHARACTERS_UNLOCKED = 0x266b #ewram
 SADV2_SONIC_EMERALDS = 0x2664 #ewram
@@ -49,6 +50,7 @@ class SonicAdvance2Client(BizHawkClient):
     starting_zone: int
     did_setup: bool = False
     emeralds: int = 0x00
+    last_item_idx = 0
 
     async def validate_rom(self, ctx: "BizHawkClientContext") -> bool:
         try:
@@ -71,26 +73,25 @@ class SonicAdvance2Client(BizHawkClient):
             return
         
         if not self.did_setup:
-            print(ctx.slot_data)
             starting_zone = ctx.slot_data["starting_zone"]
             starting_zone += 200
 
             sz_act1 = zone_data[starting_zone][0]
             sz_act2 = zone_data[starting_zone][2]
             sz_list = [sz_act1, sz_act2, sz_act1, sz_act2, sz_act1, sz_act2, sz_act1, sz_act2,
-                        sz_act1, sz_act2, sz_act1, sz_act2, sz_act1, sz_act2]
-            print(sz_list)
+                        sz_act1, sz_act2, sz_act1, sz_act2, sz_act1, sz_act2, sz_act1]
 
             # Update the zone table to only point to our starting zone
             await bizhawk.write(ctx.bizhawk_ctx, [(SADV2_ZONE_SELECT_TABLE, sz_list, "ROM")])
-            # Update unlocked characters to only our starting character
-            await bizhawk.write(ctx.bizhawk_ctx, [(SADV2_CHARACTERS_UNLOCKED, [0x05], "EWRAM")])
+            # Update unlocked characters to only allow our starting character
+            await bizhawk.write(ctx.bizhawk_ctx, [(SADV2_CHARACTERS_UNLOCKED, [0x01], "EWRAM")])
             # This NOPs the instruction that awards chaos emeralds
             await bizhawk.write(ctx.bizhawk_ctx, [(SADV2_UPDATE_EMERALDS, [0x00, 0x00], "ROM")])
-            # This NOPs the instruction that unlocks XX when the Egg Frog is defeated
-            await bizhawk.write(ctx.bizhawk_ctx, [(SADV2_UPDATE_ZONE_SELECT, [0x00, 0x00], "ROM")])
+            # This NOPs the instructions that unlock XX when the Egg Frog is defeated
+            # await bizhawk.write(ctx.bizhawk_ctx, [(SADV2_UPDATE_ZONE_SELECT_BOSS, [0x00, 0x00], "ROM")])
+            # await bizhawk.write(ctx.bizhawk_ctx, [(SADV2_UPDATE_ZONE_SELECT_LEVEL, [0x00, 0x00], "ROM")])
             # Full level select access up to Egg Utopia
-            await bizhawk.write(ctx.bizhawk_ctx, [(SADV2_SONIC_LEVELS_UNLOCKED, [0x18, 0x18, 0x18, 0x18, 0x18], "EWRAM")])
+            await bizhawk.write(ctx.bizhawk_ctx, [(SADV2_SONIC_LEVELS_UNLOCKED, [0x1d, 0x1d, 0x1d, 0x1d, 0x1d], "EWRAM")])
 
             self.did_setup = True
 
@@ -126,7 +127,11 @@ class SonicAdvance2Client(BizHawkClient):
             Setting emeralds in game is visual only for tracking purposes
         """
 
-        for item in item_list:
+        if self.last_item_idx >= len(item_list):
+            # Don't process more items until we reach a new one
+            return
+        
+        for item in item_list[self.last_item_idx:]:
 
             item_id = item.item
             if (item_id // 100 == 1):
@@ -139,9 +144,10 @@ class SonicAdvance2Client(BizHawkClient):
                 self.emeralds = self.emeralds | emerald_masks[item_id]
 
                 if(self.emeralds == 0x7F):
-                    await bizhawk.write(ctx.bizhawk_ctx, [(SADV2_SONIC_LEVELS_UNLOCKED, [0x1d, 0x1d, 0x1d, 0x1d, 
-                                                                                         0x1d], "EWRAM")])
+                    # await bizhawk.write(ctx.bizhawk_ctx, [(SADV2_SONIC_LEVELS_UNLOCKED, [0x1d, 0x1d, 0x1d, 0x1d, 
+                                                                                        # 0x1d], "EWRAM")])
                     await bizhawk.write(ctx.bizhawk_ctx, [(SADV2_AREA_53_UNLOCKED, [0x02], "EWRAM")])
                     
                 await bizhawk.write(ctx.bizhawk_ctx, [(SADV2_SONIC_EMERALDS, [self.emeralds, self.emeralds,
                                                     self.emeralds, self.emeralds, self.emeralds], "EWRAM")])
+            self.last_item_idx += 1
