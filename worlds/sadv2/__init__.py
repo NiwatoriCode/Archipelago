@@ -10,6 +10,7 @@ from .Locations import SADV2Location, leaf_forest_locations, hot_crater_location
                         xx_locations, event_locations, all_locations
 from .Regions import SADV2Region, create_regions, create_region, connect, create_locations
 from worlds.AutoWorld import World
+from .Client import SonicAdvance2Client
 
 class SADV2World(World):
     game = "Sonic Advance 2"
@@ -56,3 +57,8 @@ class SADV2World(World):
 
     def create_regions(self):
         create_regions(self.multiworld, self.options, self.player)
+
+    def fill_slot_data(self):
+        return {
+            "starting_zone": self.options.starting_zone.value
+        }
