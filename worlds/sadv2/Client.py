@@ -51,6 +51,7 @@ class SonicAdvance2Client(BizHawkClient):
     did_setup: bool = False
     emeralds: int = 0x00
     last_item_idx = 0
+    dont_check_levels = 0
 
     async def validate_rom(self, ctx: "BizHawkClientContext") -> bool:
         try:
@@ -92,6 +93,8 @@ class SonicAdvance2Client(BizHawkClient):
             # await bizhawk.write(ctx.bizhawk_ctx, [(SADV2_UPDATE_ZONE_SELECT_LEVEL, [0x00, 0x00], "ROM")])
             # Full level select access up to Egg Utopia
             await bizhawk.write(ctx.bizhawk_ctx, [(SADV2_SONIC_LEVELS_UNLOCKED, [0x1d, 0x1d, 0x1d, 0x1d, 0x1d], "EWRAM")])
+            # Set everyone's eneralds to zero
+            await bizhawk.write(ctx.bizhawk_ctx, [(SADV2_SONIC_EMERALDS, [0x00, 0x00, 0x00, 0x00, 0x00], "EWRAM")])
 
             self.did_setup = True
 
@@ -102,19 +105,30 @@ class SonicAdvance2Client(BizHawkClient):
             
             await self.add_items(ctx.items_received, ctx)
             
-            if not (int.from_bytes(demo_mode, "little") & 0x40):
-                if (int.from_bytes(level_complete, "little") == 0xFF and int.from_bytes(act_id) != 0x1d):
-                    location_id = 0x10000 + (int.from_bytes(character_id) * 0x1000) + (int.from_bytes(act_id) * 0x10)
-                    if location_id not in ctx.checked_locations:
+            if(self.dont_check_levels == 0):
+                if not (int.from_bytes(demo_mode, "little") & 0x40):
+                    if (int.from_bytes(level_complete, "little") == 0xFF and int.from_bytes(act_id) != 0x1d):
+                        location_id = 0x10000 + (int.from_bytes(character_id) * 0x1000) + (int.from_bytes(act_id) * 0x10)
+                        if location_id not in ctx.checked_locations:
+                            await ctx.send_msgs([{
+                                "cmd": "LocationChecks",
+                                "locations": [location_id]
+                            }])
+
+                            # Special stages send next act's check. Stop sending checks until next act
+                            self.dont_check_levels = 1
+                    elif(int.from_bytes(level_complete, "little") == 0xFF and int.from_bytes(act_id) == 0x1d):
                         await ctx.send_msgs([{
-                            "cmd": "LocationChecks",
-                            "locations": [location_id]
+                            "cmd": "StatusUpdate",
+                            "status": ClientStatus.CLIENT_GOAL
                         }])
-                elif(int.from_bytes(level_complete, "little") == 0xFF and int.from_bytes(act_id) == 0x1d):
-                    await ctx.send_msgs([{
-                        "cmd": "StatusUpdate",
-                        "status": ClientStatus.CLIENT_GOAL
-                    }])
+                else:
+                    # Demo mode sends Leaf Forest upon exit. Stop sending checks
+                    self.dont_check_levels = 1
+            else:
+                # Resume checking locations once the player is in a valid game state
+                if (int.from_bytes(level_complete) == 0x0) and not (int.from_bytes(demo_mode, "little") & 0x40):
+                    self.dont_check_levels = 0
 
             
         except bizhawk.RequestFailedError:
