@@ -6,6 +6,7 @@ from .Locations import leaf_forest_locations, hot_crater_locations, music_plant_
                         all_locations
 from .Items import zone_table, SADV2Item
 from .Options import SADV2Options
+from . import Names
 
 class SADV2Region(Region):
     game: str = "Sonic Advance 2"
@@ -15,49 +16,42 @@ def create_regions(world: MultiWorld, options: SADV2Options, player: int):
     world.regions.append(menu_region)
 
     leaf_forest = create_region("Leaf Forest", player, world)
-    create_locations(leaf_forest, "Sonic - Leaf Forest Act 1", "Sonic - Leaf Forest Act 2", 
-                     "Sonic - Leaf Forest Boss Act")
+    create_character_regions("Leaf Forest", leaf_forest_locations, player, world)
     connect(world, player, "Menu", "Leaf Forest", 
             lambda state: (state.has("Leaf Forest", player)))
 
     hot_crater = create_region("Hot Crater", player, world)
-    create_locations(hot_crater, "Sonic - Hot Crater Act 1", "Sonic - Hot Crater Act 2",
-                     "Sonic - Hot Crater Boss Act")
+    create_character_regions("Hot Crater", hot_crater_locations, player, world)
     connect(world, player, "Menu", "Hot Crater",
             lambda state: (state.has("Hot Crater", player)))
 
     music_plant = create_region("Music Plant", player, world)
-    create_locations(music_plant, "Sonic - Music Plant Act 1", "Sonic - Music Plant Act 2", 
-                     "Sonic - Music Plant Boss Act")
+    create_character_regions("Music Plant", music_plant_locations, player, world)
     connect(world, player, "Menu", "Music Plant",
             lambda state: (state.has("Music Plant", player)))
 
     ice_paradise = create_region("Ice Paradise", player, world)
-    create_locations(ice_paradise, "Sonic - Ice Paradise Act 1", "Sonic - Ice Paradise Act 2",
-                     "Sonic - Ice Paradise Boss Act")
+    create_character_regions("Ice Paradise", ice_paradise_locations, player, world)
     connect(world, player, "Menu", "Ice Paradise",
             lambda state: (state.has("Ice Paradise", player)))
 
     sky_canyon = create_region("Sky Canyon", player, world)
-    create_locations(sky_canyon, "Sonic - Sky Canyon Act 1", "Sonic - Sky Canyon Act 2",
-                     "Sonic - Sky Canyon Boss Act")
+    create_character_regions("Sky Canyon", sky_canyon_locations, player, world)
     connect(world, player, "Menu", "Sky Canyon",
             lambda state: (state.has("Sky Canyon", player)))
 
     techno_base = create_region("Techno Base", player, world)
-    create_locations(techno_base, "Sonic - Techno Base Act 1", "Sonic - Techno Base Act 2",
-                     "Sonic - Techno Base Boss Act")
+    create_character_regions("Techno Base", techno_base_locations, player, world)
     connect(world, player, "Menu", "Techno Base",
             lambda state: (state.has("Techno Base", player)))
 
     egg_utopia = create_region("Egg Utopia", player, world)
-    create_locations(egg_utopia, "Sonic - Egg Utopia Act 1", "Sonic - Egg Utopia Act 2", 
-                     "Sonic - Egg Utopia Boss Act")
+    create_character_regions("Egg Utopia", egg_utopia_locations, player, world)
     connect(world, player, "Menu", "Egg Utopia",
             lambda state: (state.has("Egg Utopia", player)))
 
     xx = create_region("XX", player, world)
-    create_locations(xx, "Sonic - XX")
+    create_character_regions("XX", xx_locations, player, world)
     connect(world, player, "Menu", "XX",
             lambda state: (state.has("Red Chaos Emerald", player) and
                            state.has("Blue Chaos Emerald", player) and
@@ -65,7 +59,8 @@ def create_regions(world: MultiWorld, options: SADV2Options, player: int):
                            state.has("Green Chaos Emerald", player) and
                            state.has("White Chaos Emerald", player) and
                            state.has("Cyan Chaos Emerald", player) and
-                           state.has("Purple Chaos Emerald", player)))
+                           state.has("Purple Chaos Emerald", player) and
+                           state.has(Names.sonic_unlock, player)))
     
     xx.add_event("True Area 53", "Vanilla Rescued", location_type=SADV2Location, item_type=SADV2Item)
 
@@ -85,3 +80,33 @@ def connect(world: MultiWorld, player: int, outer_region: str, inner_region: str
     outer = world.get_region(outer_region, player)
     inner = world.get_region(inner_region, player)
     return outer.connect(inner, rule=rule)
+
+def create_character_regions(region: str, locations: dict, player: int, world: MultiWorld):
+    sonic_region = create_region(region + " - Sonic", player, world)
+    cream_region = create_region(region + " - Cream", player, world)
+    tails_region = create_region(region + " - Tails", player, world)
+    knuckles_region = create_region(region + " - Knuckles", player, world)
+    amy_region = create_region(region + " - Amy", player, world)
+
+    for key in locations.keys():
+        if "Sonic" in key:
+            create_locations(sonic_region, key)
+        elif "Cream" in key:
+            create_locations(cream_region, key)
+        elif "Tails" in key:
+            create_locations(tails_region, key)
+        elif "Knuckles" in key:
+            create_locations(knuckles_region, key)
+        else:
+            create_locations(amy_region, key)
+    
+    connect(world, player, region, region + " - Sonic",
+            lambda state: (state.has(Names.sonic_unlock, player)))
+    connect(world, player, region, region + " - Cream", 
+            lambda state: (state.has(Names.cream_unlock, player)))
+    connect(world, player, region, region + " - Tails", 
+            lambda state: (state.has(Names.tails_unlock, player)))
+    connect(world, player, region, region + " - Knuckles",
+            lambda state: (state.has(Names.knuckles_unlock, player)))
+    connect(world, player, region, region + " - Amy",
+            lambda state: (state.has(Names.amy_unlock, player)))

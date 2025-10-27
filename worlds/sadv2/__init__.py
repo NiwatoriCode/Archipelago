@@ -45,6 +45,10 @@ class SADV2World(World):
         itempool.extend([self.create_item(name) for name in zone_table.keys() if name != starting_zone])
         itempool.extend(self.create_item(name) for name in emerald_table.keys())
 
+        starting_character = self.item_id_to_name[100 + self.options.starting_character]
+        self.multiworld.push_precollected(self.create_item(starting_character))
+        itempool.extend([self.create_item(name) for name in character_table.keys() if name != starting_character])
+
         num_locations = len(all_locations)
         filler_needed = num_locations - len(itempool)
         filler_weights = [1, 1, 1, 1, 1, 1, 1, 1, 1, 1]
@@ -60,5 +64,6 @@ class SADV2World(World):
 
     def fill_slot_data(self):
         return {
-            "starting_zone": self.options.starting_zone.value
+            "starting_zone": self.options.starting_zone.value,
+            "starting_character": self.options.starting_character.value
         }

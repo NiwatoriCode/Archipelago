@@ -1,6 +1,7 @@
 import typing
 
 from BaseClasses import Item, ItemClassification
+from . import Names
 
 class ItemData(typing.NamedTuple):
     code: typing.Optional[int]
@@ -14,27 +15,31 @@ class SADV2Item(Item):
         super(SADV2Item, self).__init__(name, classification, code, player)
 
 character_table = {
-    "Sonic Rescued": ItemData(100, 1)
+    Names.sonic_unlock: ItemData(100, 1),
+    Names.cream_unlock: ItemData(101, 1),
+    Names.tails_unlock: ItemData(102, 1),
+    Names.knuckles_unlock: ItemData(103, 1),
+    Names.amy_unlock: ItemData(104, 1)
 }
 
 zone_table = {
-    "Leaf Forest": ItemData(200, 1),
-    "Hot Crater": ItemData(201, 1),
-    "Music Plant": ItemData(202, 1),
-    "Ice Paradise": ItemData(203, 1),
-    "Sky Canyon": ItemData(204, 1),
-    "Techno Base": ItemData(205, 1),
-    "Egg Utopia": ItemData(206, 1)
+    Names.lf_unlock: ItemData(200, 1),
+    Names.hc_unlock: ItemData(201, 1),
+    Names.mp_unlock: ItemData(202, 1),
+    Names.ip_unlock: ItemData(203, 1),
+    Names.sc_unlock: ItemData(204, 1),
+    Names.tb_unlock: ItemData(205, 1),
+    Names.eu_unlock: ItemData(206, 1)
 }
 
 emerald_table = {
-    "Red Chaos Emerald": ItemData(300, 2),
-    "Blue Chaos Emerald": ItemData(301, 2),
-    "Yellow Chaos Emerald": ItemData(302, 2),
-    "Green Chaos Emerald": ItemData(303, 2),
-    "White Chaos Emerald": ItemData(304, 2),
-    "Cyan Chaos Emerald": ItemData(305, 2),
-    "Purple Chaos Emerald": ItemData(306, 2)
+    Names.red_emerald: ItemData(300, 2),
+    Names.blue_emerald: ItemData(301, 2),
+    Names.yellow_emerald: ItemData(302, 2),
+    Names.greed_emerald: ItemData(303, 2),
+    Names.white_emerald: ItemData(304, 2),
+    Names.cyan_emerald: ItemData(305, 2),
+    Names.purple_emerald: ItemData(306, 2)
 }
 
 filler_table = {
