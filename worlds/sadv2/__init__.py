@@ -11,6 +11,7 @@ from .Locations import SADV2Location, leaf_forest_locations, hot_crater_location
 from .Regions import SADV2Region, create_regions, create_region, connect, create_locations
 from worlds.AutoWorld import World
 from .Client import SonicAdvance2Client
+from . import Names
 
 class SADV2World(World):
     game = "Sonic Advance 2"
@@ -22,9 +23,9 @@ class SADV2World(World):
     location_name_to_id = {name: id for name, id in all_locations.items() if id is not None}
 
     item_name_groups = {
-        "emeralds": { "Red Chaos Emerald", "Blue Chaos Emerald", "Yellow Chaos Emerald",
+        "chaos emeralds": { "Red Chaos Emerald", "Blue Chaos Emerald", "Yellow Chaos Emerald",
                      "Green Chaos Emerald", "White Chaos Emerald", "Cyan Chaos Emerald", "Purple Chaos Emerald" },
-        "zones": { "Leaf Forest", "Hot Crater", "Music Plant", "Ice Paradice", "Sky Canyon", "Techno Base", "Egg Utopia" }
+        "zones": { "Leaf Forest", "Hot Crater", "Music Plant", "Ice Paradise", "Sky Canyon", "Techno Base", "Egg Utopia" }
     }
 
     def create_item(self, name: str) -> SADV2Item:
@@ -42,8 +43,14 @@ class SADV2World(World):
         itempool = []
         starting_zone = self.item_id_to_name[200 + self.options.starting_zone]
         self.multiworld.push_precollected(self.create_item(starting_zone))
-        itempool.extend([self.create_item(name) for name in zone_table.keys() if name != starting_zone])
+        itempool.extend([self.create_item(name) for name in zone_table.keys() if name != starting_zone and
+                                                                                name != Names.xx_unlock])
         itempool.extend(self.create_item(name) for name in emerald_table.keys())
+
+        xx_count = 0
+        while xx_count < self.options.xx_coords_pool:
+            itempool.append(self.create_item(Names.xx_unlock))
+            xx_count += 1
 
         starting_character = self.item_id_to_name[100 + self.options.starting_character]
         self.multiworld.push_precollected(self.create_item(starting_character))
@@ -60,10 +67,12 @@ class SADV2World(World):
         self.multiworld.itempool += itempool
 
     def create_regions(self):
-        create_regions(self.multiworld, self.options, self.player)
+        create_regions(self.multiworld, self.options, self.player, self.options.xx_coords.value)
 
     def fill_slot_data(self):
         return {
             "starting_zone": self.options.starting_zone.value,
-            "starting_character": self.options.starting_character.value
+            "starting_character": self.options.starting_character.value,
+            "xx_coords": self.options.xx_coords.value,
+            "xx_total": self.options.xx_coords_pool.value
         }

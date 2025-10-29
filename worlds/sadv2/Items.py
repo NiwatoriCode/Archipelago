@@ -29,7 +29,8 @@ zone_table = {
     Names.ip_unlock: ItemData(203, 1),
     Names.sc_unlock: ItemData(204, 1),
     Names.tb_unlock: ItemData(205, 1),
-    Names.eu_unlock: ItemData(206, 1)
+    Names.eu_unlock: ItemData(206, 1),
+    Names.xx_unlock: ItemData(207, 2)
 }
 
 emerald_table = {

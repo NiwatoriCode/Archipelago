@@ -143,6 +143,7 @@ ip_unlock = "Ice Paradise"
 sc_unlock = "Sky Canyon"
 tb_unlock = "Techno Base"
 eu_unlock = "Egg Utopia"
+xx_unlock = "XX Coordinates"
 
 # Emeralds
 red_emerald = "Red Chaos Emerald"

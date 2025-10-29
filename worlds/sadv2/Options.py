@@ -1,6 +1,6 @@
 from dataclasses import dataclass
 
-from Options import Choice, PerGameCommonOptions
+from Options import Range, Choice, PerGameCommonOptions
 
 class StartingZone(Choice):
     """
@@ -35,7 +35,31 @@ class StartingCharacter(Choice):
 
     default = option_sonic
 
+class XXCoordianatesRequired(Range):
+    """
+    The number of XX Coordinates that must be received to unlock XX.
+    """
+
+    display_name = "XX Coordinates Required"
+    range_start = 1
+    range_end = 75
+
+    default = 50
+
+class XXCoordinatesPool(Range):
+    """
+    The number of XX Coordinates in the itempool. Must be equal to or greater than the number required.
+    """
+
+    display_name = "XX Coordinates Total"
+    range_start = 1
+    range_end = 75
+
+    default = 75
+
 @dataclass
 class SADV2Options(PerGameCommonOptions):
     starting_zone: StartingZone
     starting_character: StartingCharacter
+    xx_coords: XXCoordianatesRequired
+    xx_coords_pool: XXCoordinatesPool

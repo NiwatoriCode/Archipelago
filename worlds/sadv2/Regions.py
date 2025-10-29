@@ -11,7 +11,7 @@ from . import Names
 class SADV2Region(Region):
     game: str = "Sonic Advance 2"
 
-def create_regions(world: MultiWorld, options: SADV2Options, player: int):
+def create_regions(world: MultiWorld, options: SADV2Options, player: int, xx_coords: int):
     menu_region = Region("Menu", player, world, "Zone Select")
     world.regions.append(menu_region)
 
@@ -53,13 +53,7 @@ def create_regions(world: MultiWorld, options: SADV2Options, player: int):
     xx = create_region("XX", player, world)
     create_character_regions("XX", xx_locations, player, world)
     connect(world, player, "Menu", "XX",
-            lambda state: (state.has("Red Chaos Emerald", player) and
-                           state.has("Blue Chaos Emerald", player) and
-                           state.has("Yellow Chaos Emerald", player) and
-                           state.has("Green Chaos Emerald", player) and
-                           state.has("White Chaos Emerald", player) and
-                           state.has("Cyan Chaos Emerald", player) and
-                           state.has("Purple Chaos Emerald", player) and
+            lambda state: (state.has_all_counts({Names.xx_unlock: xx_coords}, player) and
                            state.has(Names.sonic_unlock, player)))
     
     xx.add_event("True Area 53", "Vanilla Rescued", location_type=SADV2Location, item_type=SADV2Item)
