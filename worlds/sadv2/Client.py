@@ -105,9 +105,10 @@ class SonicAdvance2Client(BizHawkClient):
             self.did_setup = True
 
         try:
-            level_complete, demo_mode, act_id, character_id = await bizhawk.read(ctx.bizhawk_ctx, [
+            level_complete, demo_mode, act_id, character_id, xx_complete = await bizhawk.read(ctx.bizhawk_ctx, [
                 (SADV2_LEVEL_COMPLETE, 1, "IWRAM"), (SADV2_STAGE_FLAGS, 1, "IWRAM"),
-                (SADV2_CURRENT_LEVEL, 1, "IWRAM"), (SADV2_CURRENT_CHARACTER, 1, "IWRAM")])
+                (SADV2_CURRENT_LEVEL, 1, "IWRAM"), (SADV2_CURRENT_CHARACTER, 1, "IWRAM"), 
+                (SADV2_STAGE_FLAGS + 0x01, 1, "IWRAM")])
             
             await self.add_items(ctx.items_received, ctx)
             
@@ -128,8 +129,14 @@ class SonicAdvance2Client(BizHawkClient):
                             "cmd": "StatusUpdate",
                             "status": ClientStatus.CLIENT_GOAL
                         }])
-                    elif(int.from_bytes(level_complete) == 0xFF and int.from_bytes(act_id) == 0x1c):
-                        await self.handle_xx(character_id, ctx)
+                    # XX messes with the usual level completion code but we can use this stage flag to check it
+                    elif(int.from_bytes(xx_complete) == 0x04 and int.from_bytes(act_id) == 0x1c):
+                        location_id = 0x10000 + (int.from_bytes(character_id) * 0x1000) + (0x1c * 0x10)
+                        if location_id not in ctx.checked_locations:
+                            await ctx.send_msgs([{
+                                "cmd": "LocationChecks",
+                                "locations": [location_id]
+                            }])
                 else:
                     # Demo mode sends Leaf Forest upon exit. Stop sending checks
                     self.dont_check_levels = 1
@@ -181,18 +188,3 @@ class SonicAdvance2Client(BizHawkClient):
                 await bizhawk.write(ctx.bizhawk_ctx, [(SADV2_SONIC_EMERALDS, [self.emeralds, self.emeralds,
                                                     self.emeralds, self.emeralds, self.emeralds], "EWRAM")])
             self.last_item_idx += 1
-
-    async def handle_xx(self, character_id: int, ctx: "BizHawkClientContext"):
-        if not self.xx_handler:
-            self.xx_handler = True
-
-            self.dont_check_levels = 1
-        else:
-            location_id = 0x10000 + (int.from_bytes(character_id) * 0x1000) + (0x1c * 0x10)
-            if location_id not in ctx.checked_locations:
-                await ctx.send_msgs([{
-                    "cmd": "LocationChecks",
-                    "locations": [location_id]
-                }])
-            self.xx_handler = False
-            self.dont_check_levels = 1
