@@ -18,6 +18,7 @@ class SADV2World(World):
     options_dataclass = SADV2Options
     options: SADV2Options
     topology_present = True
+    xx_req = 0
 
     item_name_to_id = {name: data.code for name, data in item_table.items()}
     location_name_to_id = {name: id for name, id in all_locations.items() if id is not None}
@@ -27,6 +28,9 @@ class SADV2World(World):
                      "Green Chaos Emerald", "White Chaos Emerald", "Cyan Chaos Emerald", "Purple Chaos Emerald" },
         "zones": { "Leaf Forest", "Hot Crater", "Music Plant", "Ice Paradise", "Sky Canyon", "Techno Base", "Egg Utopia" }
     }
+
+    def generate_early(self) -> None:
+        self.xx_req = int(self.options.xx_coords_pool * (self.options.xx_coords / 100)) + 1
 
     def create_item(self, name: str) -> SADV2Item:
         item = item_table[name]
@@ -73,6 +77,6 @@ class SADV2World(World):
         return {
             "starting_zone": self.options.starting_zone.value,
             "starting_character": self.options.starting_character.value,
-            "xx_coords": self.options.xx_coords.value,
+            "xx_coords": self.xx_req,
             "xx_total": self.options.xx_coords_pool.value
         }

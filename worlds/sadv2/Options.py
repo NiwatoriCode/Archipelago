@@ -37,18 +37,18 @@ class StartingCharacter(Choice):
 
 class XXCoordinatesRequired(Range):
     """
-    The number of XX Coordinates that must be received to unlock XX.
+    The percentage of XX Coordinates that must be received to unlock XX.
     """
 
-    display_name = "XX Coordinates Required"
+    display_name = "Percentage Required for XX"
     range_start = 1
-    range_end = 75
+    range_end = 100
 
-    default = 50
+    default = 66
 
 class XXCoordinatesPool(Range):
     """
-    The number of XX Coordinates in the itempool. Must be equal to or greater than the number required.
+    The number of XX Coordinates in the itempool.
     """
 
     display_name = "XX Coordinates Total"
