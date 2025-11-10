@@ -37,6 +37,8 @@ class SADV2World(World):
         self.starting_character = self.options.starting_character.value
         self.starting_zone = self.options.starting_zone.value
 
+        self.multiworld.completion_condition[self.player] = lambda state: state.has("Vanilla Rescued", self.player)
+
     def create_item(self, name: str) -> SADV2Item:
         item = item_table[name]
         classification = ItemClassification.filler
