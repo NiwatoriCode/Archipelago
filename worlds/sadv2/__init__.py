@@ -71,7 +71,7 @@ class SADV2World(World):
         self.multiworld.itempool += itempool
 
     def create_regions(self):
-        create_regions(self.multiworld, self.options, self.player, self.options.xx_coords.value)
+        create_regions(self.multiworld, self.options, self.player, self.xx_req)
 
     def fill_slot_data(self):
         return {
