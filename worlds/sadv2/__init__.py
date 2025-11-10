@@ -19,6 +19,8 @@ class SADV2World(World):
     options: SADV2Options
     topology_present = True
     xx_req = 0
+    starting_character = 0
+    starting_zone = 0
 
     item_name_to_id = {name: data.code for name, data in item_table.items()}
     location_name_to_id = {name: id for name, id in all_locations.items() if id is not None}
@@ -31,6 +33,9 @@ class SADV2World(World):
 
     def generate_early(self) -> None:
         self.xx_req = int(self.options.xx_coords_pool * (self.options.xx_coords / 100)) + 1
+
+        self.starting_character = self.options.starting_character.value
+        self.starting_zone = self.options.starting_zone.value
 
     def create_item(self, name: str) -> SADV2Item:
         item = item_table[name]
@@ -45,7 +50,7 @@ class SADV2World(World):
 
     def create_items(self) -> None:
         itempool = []
-        starting_zone = self.item_id_to_name[200 + self.options.starting_zone]
+        starting_zone = self.item_id_to_name[200 + self.starting_zone]
         self.multiworld.push_precollected(self.create_item(starting_zone))
         itempool.extend([self.create_item(name) for name in zone_table.keys() if name != starting_zone and
                                                                                 name != Names.xx_unlock])
@@ -56,7 +61,7 @@ class SADV2World(World):
             itempool.append(self.create_item(Names.xx_unlock))
             xx_count += 1
 
-        starting_character = self.item_id_to_name[100 + self.options.starting_character]
+        starting_character = self.item_id_to_name[100 + self.starting_character]
         self.multiworld.push_precollected(self.create_item(starting_character))
         itempool.extend([self.create_item(name) for name in character_table.keys() if name != starting_character])
 
@@ -75,8 +80,8 @@ class SADV2World(World):
 
     def fill_slot_data(self):
         return {
-            "starting_zone": self.options.starting_zone.value,
-            "starting_character": self.options.starting_character.value,
+            "starting_zone": self.starting_zone,
+            "starting_character": self.starting_character,
             "xx_coords": self.xx_req,
             "xx_total": self.options.xx_coords_pool.value
         }
