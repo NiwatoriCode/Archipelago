@@ -35,7 +35,7 @@ class StartingCharacter(Choice):
 
     default = option_sonic
 
-class XXCoordianatesRequired(Range):
+class XXCoordinatesRequired(Range):
     """
     The number of XX Coordinates that must be received to unlock XX.
     """
@@ -61,5 +61,5 @@ class XXCoordinatesPool(Range):
 class SADV2Options(PerGameCommonOptions):
     starting_zone: StartingZone
     starting_character: StartingCharacter
-    xx_coords: XXCoordianatesRequired
+    xx_coords: XXCoordinatesRequired
     xx_coords_pool: XXCoordinatesPool
