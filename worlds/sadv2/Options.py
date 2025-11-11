@@ -41,10 +41,10 @@ class XXCoordinatesRequired(Range):
     """
 
     display_name = "Percentage Required for XX"
-    range_start = 1
-    range_end = 100
+    range_start = 25
+    range_end = 75
 
-    default = 66
+    default = 50
 
 class XXCoordinatesPool(Range):
     """
@@ -53,9 +53,9 @@ class XXCoordinatesPool(Range):
 
     display_name = "XX Coordinates Total"
     range_start = 1
-    range_end = 75
+    range_end = 50
 
-    default = 75
+    default = 50
 
 @dataclass
 class SADV2Options(PerGameCommonOptions):
