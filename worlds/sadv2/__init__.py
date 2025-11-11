@@ -2,7 +2,7 @@ import settings
 import typing
 import logging
 
-from BaseClasses import ItemClassification
+from BaseClasses import ItemClassification, MultiWorld
 from .Options import SADV2Options
 from .Items import SADV2Item, character_table, zone_table, emerald_table, event_table, item_table, filler_table
 from .Locations import SADV2Location, leaf_forest_locations, hot_crater_locations, music_plant_locations, \
@@ -79,6 +79,12 @@ class SADV2World(World):
 
     def create_regions(self):
         create_regions(self.multiworld, self.options, self.player, self.xx_req)
+
+    def stage_fill_hook(multiworld: MultiWorld, progitempool, usefulitempool, filleritempool, fill_locations):
+        if multiworld.get_game_players("Sonic Advance 2"):
+            progitempool.sort(
+                key=lambda item: 1 if("XX" in item.name and item.game == "Sonic Advance 2") else 0
+            )
 
     def fill_slot_data(self):
         return {
