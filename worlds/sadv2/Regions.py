@@ -53,10 +53,19 @@ def create_regions(world: MultiWorld, options: SADV2Options, player: int, xx_coo
     xx = create_region("XX", player, world)
     create_character_regions("XX", xx_locations, player, world)
     connect(world, player, "Menu", "XX",
-            lambda state: (state.has_all_counts({Names.xx_unlock: xx_coords}, player) and
-                           state.has(Names.sonic_unlock, player)))
+            lambda state: (state.has_all_counts({Names.xx_unlock: xx_coords}, player)))
     
-    xx.add_event("True Area 53", "Vanilla Rescued", location_type=SADV2Location, item_type=SADV2Item)
+    true_area_53 = create_region("True Area 53", player, world)
+    true_area_53.add_event("True Area 53", "Vanilla Rescued", location_type=SADV2Location, item_type=SADV2Item)
+    connect(world, player, "Menu", "True Area 53", 
+            lambda state: (state.has(Names.sonic_unlock, player),
+                           state.has(Names.red_emerald, player),
+                           state.has(Names.blue_emerald, player),
+                           state.has(Names.yellow_emerald, player),
+                           state.has(Names.green_emerald, player),
+                           state.has(Names.cyan_emerald, player),
+                           state.has(Names.white_emerald, player),
+                           state.has(Names.purple_emerald, player)))
 
 
 

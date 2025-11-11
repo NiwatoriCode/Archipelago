@@ -37,7 +37,7 @@ emerald_table = {
     Names.red_emerald: ItemData(300, 2),
     Names.blue_emerald: ItemData(301, 2),
     Names.yellow_emerald: ItemData(302, 2),
-    Names.greed_emerald: ItemData(303, 2),
+    Names.green_emerald: ItemData(303, 2),
     Names.white_emerald: ItemData(304, 2),
     Names.cyan_emerald: ItemData(305, 2),
     Names.purple_emerald: ItemData(306, 2)
