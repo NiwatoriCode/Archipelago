@@ -53,7 +53,7 @@ class SonicAdvance2Client(BizHawkClient):
     characters: int = 0x00
     xx_coords: int = 0
     last_item_idx = 0
-    dont_check_levels = 0
+    dont_check_levels = 1
     xx_handler: bool = False
 
     async def validate_rom(self, ctx: "BizHawkClientContext") -> bool:
@@ -118,8 +118,8 @@ class SonicAdvance2Client(BizHawkClient):
                                 "locations": [location_id]
                             }])
 
-                            # Special stages send next act's check. Stop sending checks until next act
-                            self.dont_check_levels = 1
+                        # Special stages send next act's check. Stop sending checks until next act
+                        self.dont_check_levels = 1
                     elif(int.from_bytes(level_complete, "little") == 0xFF and int.from_bytes(act_id) == 0x1d):
                         await ctx.send_msgs([{
                             "cmd": "StatusUpdate",
@@ -133,6 +133,9 @@ class SonicAdvance2Client(BizHawkClient):
                                 "cmd": "LocationChecks",
                                 "locations": [location_id]
                             }])
+                        
+                        # The credits don't clear the address. Stop sending checks until the player enters gameplay again.
+                        self.dont_check_levels = 1
                 else:
                     # Demo mode sends Leaf Forest upon exit. Stop sending checks
                     self.dont_check_levels = 1
