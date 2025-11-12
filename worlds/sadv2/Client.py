@@ -61,7 +61,6 @@ class SonicAdvance2Client(BizHawkClient):
             game_code: bytes = ((await bizhawk.read(ctx.bizhawk_ctx, [(0xac, 4, "ROM")])))
             
             if game_code[0] != b"A2NE":
-                print(game_code)
                 return False
         except bizhawk.RequestFailedError:
             return False
@@ -92,12 +91,9 @@ class SonicAdvance2Client(BizHawkClient):
             await bizhawk.write(ctx.bizhawk_ctx, [(SADV2_CHARACTERS_UNLOCKED, [starting_character], "EWRAM")])
             # This NOPs the instruction that awards chaos emeralds
             await bizhawk.write(ctx.bizhawk_ctx, [(SADV2_UPDATE_EMERALDS, [0x00, 0x00], "ROM")])
-            # This NOPs the instructions that unlock XX when the Egg Frog is defeated
-            # await bizhawk.write(ctx.bizhawk_ctx, [(SADV2_UPDATE_ZONE_SELECT_BOSS, [0x00, 0x00], "ROM")])
-            # await bizhawk.write(ctx.bizhawk_ctx, [(SADV2_UPDATE_ZONE_SELECT_LEVEL, [0x00, 0x00], "ROM")])
             # Full level select access up to XX
             await bizhawk.write(ctx.bizhawk_ctx, [(SADV2_SONIC_LEVELS_UNLOCKED, [0x1d, 0x1d, 0x1d, 0x1d, 0x1d], "EWRAM")])
-            # Set everyone's eneralds to zero
+            # Set everyone's emeralds to zero
             await bizhawk.write(ctx.bizhawk_ctx, [(SADV2_SONIC_EMERALDS, [0x00, 0x00, 0x00, 0x00, 0x00], "EWRAM")])
             # Block off True Area 53
             await bizhawk.write(ctx.bizhawk_ctx, [(SADV2_AREA_53_UNLOCKED, [0x00], "EWRAM")])
