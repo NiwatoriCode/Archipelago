@@ -46,14 +46,15 @@ emerald_table = {
 filler_table = {
     "Cheat Code to Unlock Shadow": ItemData(400, 0),
     "The Other Half of the Moon": ItemData(401, 0),
-    "Love Letter From Vector": ItemData(402, 0),
+    "Land of Darkness": ItemData(402, 0),
     "Computer Room": ItemData(403, 0),
     "Huge Chao Garden": ItemData(404, 0),
     "Scratch and Grounder": ItemData(405, 0),
     "Bocoe and Decoe": ItemData(406, 0),
     "Orbot and Cubot": ItemData(407, 0),
     "Phantom Ruby": ItemData(408, 0),
-    "Every Single Drop of All You've Got": ItemData(409, 0)
+    "Every Single Drop of All You've Got": ItemData(409, 0),
+    "Every Single Bit of All You Have": ItemData(410, 0)
 }
 
 event_table = {
