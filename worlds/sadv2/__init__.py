@@ -69,7 +69,7 @@ class SADV2World(World):
 
         num_locations = len(all_locations)
         filler_needed = num_locations - len(itempool)
-        filler_weights = [1, 1, 1, 1, 1, 1, 1, 1, 1, 1]
+        filler_weights = [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1]
 
         itempool.extend(self.create_item(name) 
                         for name in self.random.choices(list(filler_table.keys()), weights = filler_weights,
