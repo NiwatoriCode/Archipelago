@@ -1,5 +1,5 @@
 {
-    "name": "Sonic Advance 2",
+    "game": "Sonic Advance 2",
     "authors": "Niwatori",
     "minimum_ap_version": "0.6.4",
     "world_version": "0.1.0"
