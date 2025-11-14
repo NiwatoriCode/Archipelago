@@ -23,7 +23,7 @@ clear it.
 ## Connecting to a server
 
 1. Sonic Advance 2 uses Archipelago's Bizhawk Client, which can be found in the Archipelago Launcher
-2. Open EmuHawk and run your Sonic Advance 2 rom. Make sure the game opens to the title screen. If it opens to the name entry screen, enter your name so that the game loads to the title screen.
+2. Open EmuHawk and run your Sonic Advance 2 rom. Make sure the game opens to the title screen. If it opens to the language select screen, select your language and enter your name so that the game loads to the title screen.
 3. In EmuHawk, go to `Tools > Lua Console`. This window must stay open while playing.
 4. In the Lua Console window, go to `Script > Open Script...`.
 5. Navigate to your Archipelago install folder and open `data/lua/connector_bizhawk_generic.lua`.
