@@ -54,7 +54,6 @@ class SonicAdvance2Client(BizHawkClient):
     xx_coords: int = 0
     last_item_idx = 0
     dont_check_levels = 1
-    xx_handler: bool = False
 
     async def validate_rom(self, ctx: "BizHawkClientContext") -> bool:
         try:
