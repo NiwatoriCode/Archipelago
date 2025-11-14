@@ -40,7 +40,7 @@ class XXCoordinatesRequired(Range):
     The percentage of XX Coordinates that must be received to unlock XX.
     """
 
-    display_name = "Percentage Required for XX"
+    display_name = "XX Coordinates Required"
     range_start = 25
     range_end = 75
 
